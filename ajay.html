@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ajay Krishna J S — Software Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0B0F13;
+    --surface: #10161C;
+    --surface-2: #141B22;
+    --line: #212B33;
+    --text: #E7EDF2;
+    --text-dim: #8B99A4;
+    --text-faint: #57646E;
+    --accent: #5CCFE6;
+    --accent-dim: #3A8FA0;
+    --amber: #E3B341;
+    --ok: #7EE787;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+  }
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family: var(--sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  ::selection{ background:var(--accent); color:#00161B; }
+
+  /* ---------- layout shell ---------- */
+  .shell{
+    display:grid;
+    grid-template-columns: 260px 1fr;
+    min-height:100vh;
+  }
+  @media (max-width: 900px){
+    .shell{ grid-template-columns: 1fr; }
+  }
+
+  /* ---------- sidebar ---------- */
+  .sidebar{
+    position:sticky; top:0; height:100vh;
+    border-right:1px solid var(--line);
+    background:var(--surface);
+    padding:28px 22px;
+    display:flex; flex-direction:column;
+    overflow-y:auto;
+  }
+  @media (max-width: 900px){
+    .sidebar{ position:relative; height:auto; border-right:none; border-bottom:1px solid var(--line); }
+  }
+  .prompt{
+    font-family:var(--mono); font-size:13px; color:var(--text-faint);
+    margin-bottom:4px;
+  }
+  .prompt .user{ color:var(--ok); }
+  .prompt .at{ color:var(--text-faint); }
+  .prompt .host{ color:var(--accent); }
+  .name{
+    font-family:var(--mono); font-weight:600; font-size:19px;
+    margin:2px 0 2px; letter-spacing:-0.01em;
+  }
+  .role{ color:var(--text-dim); font-size:13.5px; margin-bottom:22px; }
+
+  nav.filetree{ font-family:var(--mono); font-size:13.5px; flex:1; }
+  nav.filetree a{
+    display:block; text-decoration:none; color:var(--text-dim);
+    padding:6px 0 6px 14px; border-left:1px solid var(--line);
+    transition: color .15s ease, border-color .15s ease;
+    cursor:pointer;
+  }
+  nav.filetree a:hover, nav.filetree a.active{
+    color:var(--accent); border-left-color:var(--accent);
+  }
+  nav.filetree a::before{ content:"./"; color:var(--text-faint); }
+  nav.filetree a:hover::before, nav.filetree a.active::before{ color:var(--accent-dim); }
+
+  .sidebar-footer{
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+    padding-top:18px; border-top:1px solid var(--line); margin-top:18px;
+  }
+  .sidebar-links{ display:flex; gap:14px; margin-top:10px; }
+  .sidebar-links a{ color:var(--text-dim); text-decoration:none; font-size:12px; }
+  .sidebar-links a:hover{ color:var(--accent); }
+  .status-dot{
+    display:inline-block; width:7px; height:7px; border-radius:50%;
+    background:var(--ok); margin-right:7px; box-shadow:0 0 6px var(--ok);
+  }
+
+  /* ---------- main content ---------- */
+  main{ padding: 60px 56px 100px; max-width: 900px; }
+  @media (max-width: 900px){ main{ padding: 40px 24px 80px; } }
+
+  section{ margin-bottom: 84px; scroll-margin-top: 30px; }
+  .path-label{
+    font-family:var(--mono); font-size:12.5px; color:var(--text-faint);
+    margin-bottom:14px; display:flex; align-items:center; gap:8px;
+  }
+  .path-label::after{ content:""; flex:1; height:1px; background:var(--line); }
+
+  h1,h2,h3{ font-family:var(--sans); font-weight:700; margin:0; letter-spacing:-0.015em; }
+  h2{ font-size: 28px; margin-bottom: 22px; }
+  p{ color:var(--text-dim); margin:0 0 14px; max-width: 65ch; }
+
+  /* ---------- hero ---------- */
+  .hero{ padding-top: 10px; margin-bottom: 96px; }
+  .hero-kicker{
+    font-family:var(--mono); color:var(--accent); font-size:14px; margin-bottom:18px;
+    min-height: 20px;
+  }
+  .hero-kicker .cursor{ display:inline-block; width:8px; height:16px; background:var(--accent); margin-left:2px; animation: blink 1s steps(1) infinite; vertical-align:-2px; }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .hero h1{
+    font-size: clamp(34px, 5vw, 54px); line-height:1.08; max-width: 14ch;
+  }
+  .hero .lead{ font-size:17px; margin-top:22px; max-width:56ch; }
+  .hero-meta{
+    display:flex; flex-wrap:wrap; gap: 22px; margin-top:30px;
+    font-family:var(--mono); font-size:13px; color:var(--text-faint);
+  }
+  .hero-meta span b{ color:var(--text); font-weight:600; }
+
+  /* ---------- about ---------- */
+  .about-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  @media (max-width:700px){ .about-grid{ grid-template-columns:1fr; } }
+  .edu-item{ margin-bottom:20px; padding-left:16px; border-left:2px solid var(--line); }
+  .edu-item .years{ font-family:var(--mono); font-size:12px; color:var(--accent); }
+  .edu-item .school{ font-weight:600; margin-top:2px; }
+  .edu-item .detail{ color:var(--text-dim); font-size:14px; margin-top:2px; }
+
+  /* ---------- skills ---------- */
+  .skill-groups{ display:grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media (max-width:700px){ .skill-groups{ grid-template-columns:1fr; } }
+  .skill-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:18px 20px;
+  }
+  .skill-card .label{ font-family:var(--mono); font-size:12px; color:var(--text-faint); margin-bottom:10px; }
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    font-family:var(--mono); font-size:12.5px; color:var(--text);
+    background:var(--surface-2); border:1px solid var(--line);
+    padding:4px 9px; border-radius:4px;
+  }
+
+  /* ---------- projects ---------- */
+  .project{
+    border:1px solid var(--line); border-radius:8px; background:var(--surface);
+    padding:26px 28px; margin-bottom:22px; position:relative; overflow:hidden;
+  }
+  .project::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--line);
+    transition:background .2s ease;
+  }
+  .project:hover::before{ background:var(--accent); }
+  .project-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+  .project-title{ font-size:19px; font-weight:700; }
+  .project-stack{ font-family:var(--mono); font-size:12px; color:var(--accent-dim); margin-top:4px; }
+  .project-date{ font-family:var(--mono); font-size:12px; color:var(--text-faint); white-space:nowrap; margin-top:4px; }
+  .project ul{ margin:16px 0 14px; padding-left:18px; color:var(--text-dim); font-size:14.5px; }
+  .project li{ margin-bottom:6px; }
+  .project-link{
+    font-family:var(--mono); font-size:13px; color:var(--accent);
+    text-decoration:none; display:inline-flex; align-items:center; gap:6px;
+  }
+  .project-link:hover{ text-decoration:underline; }
+
+  /* ---------- certifications ---------- */
+  .cert-list{ display:flex; flex-direction:column; }
+  .cert-row{
+    display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+    padding:16px 0; border-bottom:1px solid var(--line); flex-wrap:wrap;
+  }
+  .cert-row:last-child{ border-bottom:none; }
+  .cert-name{ font-weight:600; font-size:15px; }
+  .cert-issuer{ color:var(--text-faint); font-size:13px; font-family:var(--mono); margin-top:2px; }
+  .cert-date{ font-family:var(--mono); font-size:12.5px; color:var(--text-faint); white-space:nowrap; }
+  .cert-link{
+    font-family:var(--mono); font-size:12px; color:var(--accent);
+    text-decoration:none; white-space:nowrap; border:1px solid var(--line);
+    border-radius:4px; padding:4px 9px; transition: border-color .15s ease, background .15s ease;
+  }
+  .cert-link:hover{ border-color:var(--accent); background:var(--surface-2); }
+  .cert-row .cert-right{ display:flex; align-items:center; gap:12px; }
+
+  /* ---------- contact ---------- */
+  .contact-wrap{ display:grid; grid-template-columns: 1fr 1fr; gap:44px; }
+  @media (max-width:700px){ .contact-wrap{ grid-template-columns:1fr; } }
+  form{ display:flex; flex-direction:column; gap:14px; }
+  label{ font-family:var(--mono); font-size:12px; color:var(--text-faint); }
+  input, textarea{
+    background:var(--surface-2); border:1px solid var(--line); border-radius:5px;
+    padding:11px 12px; color:var(--text); font-family:var(--sans); font-size:14px;
+    outline:none; transition:border-color .15s ease;
+  }
+  input:focus, textarea:focus{ border-color:var(--accent); }
+  textarea{ resize:vertical; min-height:90px; }
+  button.send{
+    font-family:var(--mono); font-size:13.5px; font-weight:600;
+    background:var(--accent); color:#00161B; border:none; border-radius:5px;
+    padding:11px 16px; cursor:pointer; transition:background .15s ease;
+    align-self:flex-start;
+  }
+  button.send:hover{ background:#7fdcef; }
+  button.send:disabled{ background:var(--text-faint); cursor:not-allowed; }
+  .form-status{ font-family:var(--mono); font-size:12.5px; min-height:16px; }
+  .form-status.ok{ color:var(--ok); }
+  .form-status.err{ color:#f37272; }
+
+  .log{ font-family:var(--mono); font-size:12.5px; }
+  .log-title{ color:var(--text-faint); margin-bottom:10px; }
+  .log-entries{ display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto; padding-right:6px; }
+  .log-entry{ border-left:2px solid var(--line); padding:6px 0 6px 12px; }
+  .log-entry .meta{ color:var(--text-faint); }
+  .log-entry .msg{ color:var(--text-dim); margin-top:3px; }
+  .log-empty{ color:var(--text-faint); font-style:normal; }
+
+  footer{
+    border-top:1px solid var(--line); padding:26px 56px; font-family:var(--mono);
+    font-size:12px; color:var(--text-faint); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+  @media (max-width:900px){ footer{ padding:22px 24px; } }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="prompt"><span class="user">ajay</span><span class="at">@</span><span class="host">portfolio</span><span class="at">:~$</span></div>
+    <div class="name">Ajay Krishna J S</div>
+    <div class="role">CS Engineering · Full-Stack &amp; Systems</div>
+
+    <nav class="filetree" id="navtree">
+      <a href="#hero" class="active">home</a>
+      <a href="#about">about</a>
+      <a href="#skills">skills</a>
+      <a href="#projects">projects</a>
+      <a href="#certifications">certifications</a>
+      <a href="#contact">contact</a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div><span class="status-dot"></span>open to internships / SDE roles</div>
+      <div class="sidebar-links">
+        <a href="https://github.com/Ajaykrishna241" target="_blank" rel="noopener">github</a>
+        <a href="https://www.linkedin.com/in/ajay-krishna-j-s00" target="_blank" rel="noopener">linkedin</a>
+        <a href="mailto:ajaykrishna1232255@gmail.com">email</a>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <section id="hero" class="hero">
+      <div class="hero-kicker" id="typeline">&nbsp;</div>
+      <h1>I build things from the kernel up to the login screen — and make sure both actually work.</h1>
+      <p class="lead">Computer Science student at Lovely Professional University who's just as comfortable intercepting Linux system calls as wiring up a payment flow. I've shipped a PG booking platform people actually pay through, a kernel-level access control framework, and a hospital app that doesn't make patients wait in three different lines. If it needs a backend that holds up under real traffic, that's usually where I end up.</p>
+      <div class="hero-meta">
+        <span><b>Kozhikode, Kerala</b> · India</span>
+        <span><b>CGPA 8.35</b> · CSE, LPU</span>
+        <span><b>OCA</b> · Java SE 8</span>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="path-label">~/about</div>
+      <h2>About &amp; Education</h2>
+      <div class="about-grid">
+        <div>
+          <p>I work end-to-end — designing the schema, writing the API, then sticking around to build the UI on top of it, because I'd rather own a bug than hand it off. Recent builds include a production-style PG booking platform with real payments, a C-based Linux file access control framework that hooks into system calls, and a Flutter hospital appointment app built for people who'd rather not queue. Off the keyboard, I've run cybersecurity awareness sessions as a CSR intern with WNS Cares Foundation — turning "don't click that link" into something people actually remember.</p>
+        </div>
+        <div>
+          <div class="edu-item">
+            <div class="years">2024 – 2028</div>
+            <div class="school">Lovely Professional University, Punjab</div>
+            <div class="detail">B.Tech, Computer Science &amp; Engineering — CGPA 8.35</div>
+          </div>
+          <div class="edu-item">
+            <div class="years">2021 – 2023</div>
+            <div class="school">Naduvannur HSS Vakayad</div>
+            <div class="detail">12th, Science — 95%</div>
+          </div>
+          <div class="edu-item">
+            <div class="years">2020 – 2021</div>
+            <div class="school">Govt HSS Naduvannur</div>
+            <div class="detail">10th, Science — CGPA 10</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills">
+      <div class="path-label">~/skills</div>
+      <h2>Skills</h2>
+      <div class="skill-groups">
+        <div class="skill-card">
+          <div class="label">languages</div>
+          <div class="chip-row">
+            <span class="chip">C++</span><span class="chip">C</span><span class="chip">Java</span>
+            <span class="chip">JavaScript</span><span class="chip">Python</span><span class="chip">HTML</span><span class="chip">CSS</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="label">frameworks / tools</div>
+          <div class="chip-row">
+            <span class="chip">React</span><span class="chip">Node.js</span><span class="chip">Express.js</span>
+            <span class="chip">PostgreSQL</span><span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">Ubuntu</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="label">core</div>
+          <div class="chip-row">
+            <span class="chip">Data Structures &amp; Algorithms</span><span class="chip">REST APIs</span>
+            <span class="chip">Responsive Design</span><span class="chip">System Calls</span>
+          </div>
+        </div>
+        <div class="skill-card">
+          <div class="label">working style</div>
+          <div class="chip-row">
+            <span class="chip">Leadership</span><span class="chip">Discipline</span>
+            <span class="chip">Adaptability</span><span class="chip">Perseverance</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="path-label">~/projects</div>
+      <h2>Projects</h2>
+
+      <div class="project">
+        <div class="project-top">
+          <div>
+            <div class="project-title">StayEasePG — PG Booking Platform</div>
+            <div class="project-stack">Node.js · Express.js · PostgreSQL · Razorpay · Cloudinary</div>
+          </div>
+          <div class="project-date">Jan 2026 – May 2026</div>
+        </div>
+        <ul>
+          <li>A real marketplace, not a demo — students browse, filter, and book PG accommodation; owners manage properties, rent, and enquiries from one dashboard.</li>
+          <li>Secure auth, a PostgreSQL data layer, live Razorpay payments, Cloudinary image storage, and role-based access split across Admin, Owner, and Student.</li>
+          <li>REST APIs handling monthly rent tracking and booking management end to end — no spreadsheets involved.</li>
+        </ul>
+        <a class="project-link" href="https://github.com/Ajaykrishna241/StayEasePG-BookingSystem" target="_blank" rel="noopener">view repository →</a>
+      </div>
+
+      <div class="project">
+        <div class="project-top">
+          <div>
+            <div class="project-title">SecureSysCall — Linux File Access Control</div>
+            <div class="project-stack">C · cJSON · Linux System Calls</div>
+          </div>
+          <div class="project-date">Sep 2025 – Dec 2025</div>
+        </div>
+        <ul>
+          <li>A file access control framework that sits right at the kernel/user boundary, intercepting system calls to monitor and enforce policy in real time.</li>
+          <li>Security policies defined in JSON via cJSON, checked against an in-memory ruleset built for fast comparison against every intercepted request.</li>
+          <li>Built as a hands-on deep dive into kernel–user space interaction — the kind of low-level territory most web devs never touch.</li>
+        </ul>
+        <a class="project-link" href="https://github.com/Sreekanth-Reddy1729/systemcall-interface" target="_blank" rel="noopener">view repository →</a>
+      </div>
+
+      <div class="project">
+        <div class="project-top">
+          <div>
+            <div class="project-title">ZugifyHealth — Hospital Appointment App</div>
+            <div class="project-stack">Flutter · Dart · Node.js · PostgreSQL</div>
+          </div>
+          <div class="project-date">Aug 2026 – Ongoing</div>
+        </div>
+        <ul>
+          <li>A mobile app that replaces clinic queues with QR-based registration and appointment booking, for both patients and doctors.</li>
+          <li>Patients book in a couple of taps straight from the home screen; doctors get a dedicated view into every patient's appointment history.</li>
+          <li>Node.js and PostgreSQL on the backend keep users, doctors, appointments, and patient data in sync.</li>
+        </ul>
+        <a class="project-link" href="https://github.com/Ajaykrishna241/zugify" target="_blank" rel="noopener">view repository →</a>
+      </div>
+    </section>
+
+    <section id="certifications">
+      <div class="path-label">~/certifications</div>
+      <h2>Certifications &amp; Training</h2>
+      <div class="cert-list">
+        <div class="cert-row">
+          <div>
+            <div class="cert-name">Oracle Certified Associate, Java SE 8 Programmer</div>
+            <div class="cert-issuer" ><p>Oracle</p></div>
+          </div>
+          <div class="cert-right">
+            <div class="cert-date">May 2026</div>
+            <a class="cert-link" href="https://drive.google.com/file/d/1coPtLjooVjXe2KKLS7PBTqCCRFVIxDN0/view?usp=sharing" target="_blank" rel="noopener">view certificate →</a>
+          </div>
+        </div>
+        <div class="cert-row">
+          <div>
+            <div class="cert-name">CSR Project Intern — CyberSmart Awareness</div>
+            <div class="cert-issuer">WNS Cares Foundation</div>
+          </div>
+          <div class="cert-right">
+            <div class="cert-date">Jul – Aug 2025</div>
+            <a class="cert-link" href="https://drive.google.com/file/d/1F0_Lp6D7sQAg_qGldM7vpr8nIiwc1uD6/view?usp=sharing" target="_blank" rel="noopener">view certificate →</a>
+          </div>
+        </div>
+        <div class="cert-row">
+          <div>
+            <div class="cert-name">Programming Using C++</div>
+            <div class="cert-issuer">Infosys</div>
+          </div>
+          <div class="cert-right">
+            <div class="cert-date">Aug 2025</div>
+            <a class="cert-link" href="https://drive.google.com/file/d/1XRJrldHTNdYv6HTDrCtjnhnp0Y-rIu0_/view?usp=sharing" target="_blank" rel="noopener">view certificate →</a>
+          </div>
+        </div>
+        <div class="cert-row">
+          <div>
+            <div class="cert-name">Ethical Hacking</div>
+            <div class="cert-issuer">Udemy</div>
+          </div>
+          <div class="cert-right">
+            <div class="cert-date">Aug 2026</div>
+            <a class="cert-link" href="https://drive.google.com/file/d/1kd0CkLppcVR9PIJ6f2PMs4azeQqihqIN/view?usp=sharing">view certificate →</a>
+          </div>
+        </div>
+        <div class="cert-row">
+          <div>
+            <div class="cert-name">Campus to Corporate: Industry Level Data &amp; AI Engineering Program</div>
+            <div class="cert-issuer">Lovely Professional University</div>
+          </div>
+          <div class="cert-right">
+            <div class="cert-date">Jul 2026</div>
+            <a class="cert-link" href="https://drive.google.com/file/d/1ZKE0w9r5lYRcGmNcwGLmYbWdKM3C3dpX/view?usp=sharing" target="_blank" rel="noopener">view certificate →</a>
+          </div>
+        </div>
+        <div class="cert-row">
+          <div>
+            <div class="cert-name">Basics to Beyond Python</div>
+            <div class="cert-issuer">Self-paced</div>
+          </div>
+          <div class="cert-right">
+            <div class="cert-date">Jan 2025</div>
+            <a class="cert-link" href="https://drive.google.com/file/d/1CS4bQUh2kDo6iDOjPxQj6IE8HUwDvr6g/view?usp=sharing" target="_blank" rel="noopener">view certificate →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="path-label">~/contact</div>
+      <h2>Get in touch</h2>
+      <div class="contact-wrap">
+        <div>
+          <p>Send a message and it's saved straight to this page's backend — I'll see it, and so will anyone else who visits and checks the log. For anything private, email me directly.</p>
+          <form id="contactForm">
+            <div>
+              <label for="fname">name</label>
+              <input id="fname" type="text" required maxlength="80" />
+            </div>
+            <div>
+              <label for="femail">email</label>
+              <input id="femail" type="email" required maxlength="120" />
+            </div>
+            <div>
+              <label for="fmsg">message</label>
+              <textarea id="fmsg" required maxlength="600"></textarea>
+            </div>
+            <button type="submit" class="send" id="sendBtn">send message</button>
+            <div class="form-status" id="formStatus"></div>
+          </form>
+        </div>
+        <div>
+          <div class="log">
+            <div class="log-title">// recent messages (visible to all visitors)</div>
+            <div class="log-entries" id="logEntries">
+              <div class="log-empty">loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <span>Ajay Krishna J S — Kozhikode, Kerala</span>
+  <span>built with a terminal in mind, not a template</span>
+</footer>
+
+<script>
+  // ---------- nav active state ----------
+  const links = document.querySelectorAll('#navtree a');
+  const sections = [...links].map(l => document.querySelector(l.getAttribute('href')));
+  function onScroll(){
+    let idx = 0;
+    const y = window.scrollY + 120;
+    sections.forEach((s, i) => { if (s && s.offsetTop <= y) idx = i; });
+    links.forEach((l, i) => l.classList.toggle('active', i === idx));
+  }
+  window.addEventListener('scroll', onScroll);
+  onScroll();
+
+  // ---------- hero typeline ----------
+  const typeline = document.getElementById('typeline');
+  const phrases = [
+    "$ whoami",
+    "> full-stack developer, systems enthusiast",
+    "$ cat /etc/motd",
+    "> ships code that survives contact with production",
+  ];
+  (async function typeSeq(){
+    for (const phrase of phrases){
+      typeline.innerHTML = '';
+      for (let i = 0; i <= phrase.length; i++){
+        typeline.innerHTML = phrase.slice(0, i) + '<span class="cursor"></span>';
+        await new Promise(r => setTimeout(r, 28));
+      }
+      await new Promise(r => setTimeout(r, 700));
+    }
+    typeline.innerHTML = phrases[phrases.length-1] + '<span class="cursor"></span>';
+  })();
+
+  // ---------- contact form + persistent log ----------
+  const form = document.getElementById('contactForm');
+  const statusEl = document.getElementById('formStatus');
+  const sendBtn = document.getElementById('sendBtn');
+  const logEntries = document.getElementById('logEntries');
+
+  function escapeHtml(str){
+    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  async function loadLog(){
+    try{
+      const listRes = await window.storage.list('msg:', true);
+      const keys = (listRes && listRes.keys) ? listRes.keys : [];
+      if (keys.length === 0){
+        logEntries.innerHTML = '<div class="log-empty">no messages yet — be the first.</div>';
+        return;
+      }
+      const items = [];
+      for (const k of keys){
+        try{
+          const r = await window.storage.get(k, true);
+          if (r && r.value) items.push(JSON.parse(r.value));
+        } catch(e){ /* skip missing */ }
+      }
+      items.sort((a,b) => (b.ts||0) - (a.ts||0));
+      logEntries.innerHTML = items.slice(0, 20).map(item => {
+        const d = new Date(item.ts);
+        const when = isNaN(d) ? '' : d.toLocaleString();
+        return `<div class="log-entry">
+          <div class="meta">${escapeHtml(item.name || 'anonymous')} · ${when}</div>
+          <div class="msg">${escapeHtml(item.message || '')}</div>
+        </div>`;
+      }).join('');
+    } catch(err){
+      logEntries.innerHTML = '<div class="log-empty">log unavailable right now.</div>';
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('fname').value.trim();
+    const email = document.getElementById('femail').value.trim();
+    const message = document.getElementById('fmsg').value.trim();
+    if (!name || !email || !message){
+      statusEl.textContent = 'fill in all fields.';
+      statusEl.className = 'form-status err';
+      return;
+    }
+    sendBtn.disabled = true;
+    statusEl.textContent = 'sending…';
+    statusEl.className = 'form-status';
+    try{
+      const key = 'msg:' + Date.now() + '-' + Math.random().toString(36).slice(2,8);
+      const payload = { name, email, message, ts: Date.now() };
+      const result = await window.storage.set(key, JSON.stringify(payload), true);
+      if (!result) throw new Error('storage failed');
+      statusEl.textContent = 'message sent — thank you.';
+      statusEl.className = 'form-status ok';
+      form.reset();
+      loadLog();
+    } catch(err){
+      statusEl.textContent = 'something went wrong — try again, or email directly.';
+      statusEl.className = 'form-status err';
+    } finally {
+      sendBtn.disabled = false;
+    }
+  });
+
+  loadLog();
+</script>
+
+</body>
+</html>
